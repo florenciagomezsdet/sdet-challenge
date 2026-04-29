@@ -57,5 +57,5 @@ def created_user(base_url, valid_user_payload):
     yield resp, email
     requests.delete(
         f"{base_url}/{email}",
-        headers={"Authentication": AUTH_TOKEN},
+        headers={"Authorization": AUTH_TOKEN},
     )

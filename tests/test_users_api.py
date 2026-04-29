@@ -10,7 +10,7 @@ def _unique_email():
 
 
 def _delete(base_url, email):
-    requests.delete(f"{base_url}/{email}", headers={"Authentication": AUTH_TOKEN})
+    requests.delete(f"{base_url}/{email}", headers={"Authorization": AUTH_TOKEN})
 
 
 class TestListUsers:
@@ -175,13 +175,13 @@ class TestDeleteUser:
     def test_delete_with_valid_token_returns_204(self, base_url):
         email = _unique_email()
         requests.post(base_url, json={"name": "To Delete", "email": email, "age": 25})
-        resp = requests.delete(f"{base_url}/{email}", headers={"Authentication": AUTH_TOKEN})
+        resp = requests.delete(f"{base_url}/{email}", headers={"Authorization": AUTH_TOKEN})
         assert resp.status_code == 204
 
     def test_deleted_user_returns_404(self, base_url):
         email = _unique_email()
         requests.post(base_url, json={"name": "To Delete", "email": email, "age": 25})
-        requests.delete(f"{base_url}/{email}", headers={"Authentication": AUTH_TOKEN})
+        requests.delete(f"{base_url}/{email}", headers={"Authorization": AUTH_TOKEN})
         assert requests.get(f"{base_url}/{email}").status_code == 404
 
     def test_delete_without_token_returns_401(self, base_url, created_user):
@@ -196,5 +196,5 @@ class TestDeleteUser:
         assert resp.status_code == 401
 
     def test_delete_nonexistent_user_returns_404(self, base_url):
-        resp = requests.delete(f"{base_url}/ghost@example.com", headers={"Authentication": AUTH_TOKEN})
+        resp = requests.delete(f"{base_url}/ghost@example.com", headers={"Authorization": AUTH_TOKEN})
         assert resp.status_code == 404
