@@ -36,11 +36,6 @@ def base_url(env, base_host):
 
 
 @pytest.fixture
-def auth_token():
-    return AUTH_TOKEN
-
-
-@pytest.fixture
 def new_email():
     return f"test_{uuid.uuid4().hex[:8]}@example.com"
 

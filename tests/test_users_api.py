@@ -1,6 +1,5 @@
 import uuid
 import requests
-import pytest
 
 AUTH_TOKEN = "mysecrettoken"
 
@@ -77,6 +76,7 @@ class TestCreateUser:
     def test_create_missing_name_returns_400(self, base_url):
         resp = requests.post(base_url, json={"email": _unique_email(), "age": 25})
         assert resp.status_code == 400
+        assert "error" in resp.json()
 
     def test_create_missing_email_returns_400(self, base_url):
         resp = requests.post(base_url, json={"name": "No Email", "age": 25})
@@ -85,6 +85,7 @@ class TestCreateUser:
     def test_create_missing_age_returns_400(self, base_url):
         resp = requests.post(base_url, json={"name": "No Age", "email": _unique_email()})
         assert resp.status_code == 400
+        assert "error" in resp.json()
 
     def test_create_invalid_email_returns_400(self, base_url):
         resp = requests.post(base_url, json={"name": "Bad", "email": "not-an-email", "age": 25})
@@ -93,11 +94,13 @@ class TestCreateUser:
     def test_create_age_zero_returns_400(self, base_url):
         resp = requests.post(base_url, json={"name": "Zero", "email": _unique_email(), "age": 0})
         assert resp.status_code == 400
+        assert "error" in resp.json()
 
     def test_create_age_above_max_returns_400(self, base_url):
         resp = requests.post(base_url, json={"name": "Old", "email": _unique_email(), "age": 151})
         assert resp.status_code == 400
-
+        assert "error" in resp.json()
+        
     def test_create_age_1_is_valid(self, base_url):
         email = _unique_email()
         resp = requests.post(base_url, json={"name": "Young", "email": email, "age": 1})
@@ -117,6 +120,7 @@ class TestCreateUser:
     def test_create_empty_body_returns_400(self, base_url):
         resp = requests.post(base_url, json={})
         assert resp.status_code == 400
+        assert "error" in resp.json()   
 
 
 class TestGetUser:
@@ -167,6 +171,24 @@ class TestUpdateUser:
         _, email = created_user
         resp = requests.put(f"{base_url}/{email}", json={"name": "Name", "email": email, "age": 0})
         assert resp.status_code == 400
+
+    def test_update_invalid_email_returns_400(self, base_url, created_user):
+        _, email = created_user
+        resp = requests.put(f"{base_url}/{email}", json={"name": "Name", "email": "not-valid", "age": 30})
+        assert resp.status_code == 400
+        assert "error" in resp.json()
+
+    def test_update_missing_age_returns_400(self, base_url, created_user):
+        _, email = created_user
+        resp = requests.put(f"{base_url}/{email}", json={"name": "Name", "email": email})
+        assert resp.status_code == 400
+        assert "error" in resp.json()
+
+    def test_update_age_above_max_returns_400(self, base_url, created_user):
+        _, email = created_user
+        resp = requests.put(f"{base_url}/{email}", json={"name": "Name", "email": email, "age": 151})
+        assert resp.status_code == 400
+        assert "error" in resp.json()
 
 
 class TestDeleteUser:
