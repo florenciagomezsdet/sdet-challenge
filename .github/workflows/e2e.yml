@@ -11,7 +11,6 @@ jobs:
   test:
     name: E2E Tests — ${{ matrix.env }}
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     strategy:
       fail-fast: false
@@ -40,11 +39,12 @@ jobs:
           for i in {1..30}; do
             if curl -sf http://localhost:3000/${{ matrix.env }}/users; then
               echo "API is ready"
-              break
+              exit 0
             fi
             echo "Waiting... attempt $i"
             sleep 2
           done
+          echo "API failed to start after 60s" && exit 1
 
       - name: Run E2E tests — ${{ matrix.env }}
         run: |

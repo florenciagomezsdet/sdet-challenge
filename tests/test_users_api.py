@@ -4,7 +4,6 @@ import pytest
 
 AUTH_TOKEN = "mysecrettoken"
 
-
 def _unique_email():
     return f"test_{uuid.uuid4().hex[:8]}@example.com"
 
@@ -192,7 +191,7 @@ class TestDeleteUser:
 
     def test_delete_with_invalid_token_returns_401(self, base_url, created_user):
         _, email = created_user
-        resp = requests.delete(f"{base_url}/{email}", headers={"Authentication": "wrong"})
+        resp = requests.delete(f"{base_url}/{email}", headers={"Authorization": "wrong-token"})
         assert resp.status_code == 401
 
     def test_delete_nonexistent_user_returns_404(self, base_url):

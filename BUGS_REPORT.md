@@ -8,6 +8,16 @@ Tests were run against both `dev` and `prod` environments locally via Docker.
 
 ---
 
+## Executive Summary
+
+7 bugs were identified across both environments. 2 are **Critical** severity
+(data not persisted on PUT, authentication bypassed or broken on DELETE).
+The `dev` and `prod` environments exhibit **different behaviors** for the same
+endpoints, suggesting inconsistent middleware configuration rather than a single
+shared defect.
+
+---
+
 ## BUG-001 — Duplicate email returns 500 instead of 409
 
 **Endpoint:** `POST /{env}/users`

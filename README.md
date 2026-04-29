@@ -81,3 +81,25 @@ one environment never blocks the other.
 
 See [BUGS_REPORT.md](./BUGS_REPORT.md) for the full list of discrepancies found
 between the API behavior and the OpenAPI specification.
+
+
+## Test Design Decisions
+
+**Environment parametrization:** Instead of duplicating test files per environment,
+a single suite is parametrized via `pytest_generate_tests`. This keeps tests DRY
+and guarantees identical coverage across `dev` and `prod`.
+
+**Unique emails per test:** Each test generates a UUID-based email to avoid state
+pollution between tests, making the suite safe to run in parallel.
+
+**Teardown strategy:** The `created_user` fixture uses `yield` with a best-effort
+delete in teardown, ensuring cleanup even when assertions fail.
+
+**Authorization header finding:** During testing, it was discovered that `dev` and
+`prod` behave differently regarding authentication — `dev` ignores the token entirely
+(BUG-005) while `prod` rejects even valid tokens (BUG-006). This suggests different
+middleware configurations per environment.
+
+**fail-fast: false in CI:** The matrix strategy intentionally never cancels the
+sibling job on failure. This ensures both environments always produce a report,
+even when one has critical bugs.
